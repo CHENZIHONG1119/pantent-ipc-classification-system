@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>专利主IPC分类系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="1.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <button class="new-classification-btn" id="newClassificationBtn">
+                    <i class="fas fa-plus"></i>
+                    <span class="new-classification-btn-text">新分类</span>
+                </button>
+            </div>
+            <div class="history-controls" id="historyControls">
+                <div class="search-box">
+                    <input type="text" id="historySearch" placeholder="搜索分类记录...">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="history-actions">
+                    <button id="clearHistory">
+                        <i class="fas fa-trash"></i> 清空所有记录
+                    </button>
+                </div>
+            </div>
+            <div class="classification-list" id="classificationList">
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-paper-plane"></i>
+                    </div>
+                    <span>专利主IPC分类</span>
+                </div>
+                <div class="header-controls">
+                    <div class="api-status" id="apiStatus">
+                        <div class="status-dot" id="statusDot"></div>
+                        <span id="statusText">未连接</span>
+                    </div>
+                    <div class="user-info" id="userInfo">
+                        <i class="fas fa-user-circle"></i>
+                        <span id="currentUsername"></span>
+                    </div>
+                    <button class="btn-logout" id="logoutBtn" title="退出登录">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                    <button class="btn-admin" id="adminBtn" title="管理后台">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                    <button class="theme-toggle" id="themeToggle">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+            </header>
+
+            <div class="form-container">
+                <div class="form-section">
+                    <div class="form-title">
+                        <i class="fas fa-file-alt"></i>
+                        专利摘要输入
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="patentAbstract">专利摘要</label>
+                        <textarea class="form-textarea" id="patentAbstract" placeholder="请输入专利摘要内容..."></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn btn-primary" id="submitBtn">提交分类</button>
+                        <button class="btn btn-secondary" id="clearFormBtn">清空表单</button>
+                        <button class="btn btn-excel" id="importExcelBtn">
+                            <i class="fas fa-file-excel"></i> 导入Excel
+                        </button>
+                    </div>
+                </div>
+
+                <div class="result-section" id="resultSection">
+                    <div class="result-title">
+                        <i class="fas fa-chart-bar"></i>
+                        分类结果
+                    </div>
+                    <div class="result-content" id="resultContent">
+                        <!-- 分类结果将动态显示在这里 -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Excel导入模态框 -->
+    <div class="excel-modal" id="excelModal">
+        <div class="excel-modal-content">
+            <div class="excel-modal-header">
+                <h3><i class="fas fa-file-excel"></i> 批量导入专利摘要</h3>
+                <button class="excel-modal-close" id="closeExcelModal">&times;</button>
+            </div>
+            <div class="excel-modal-body">
+                <div class="excel-upload-area" id="excelUploadArea">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>点击或拖拽Excel文件到此处</p>
+                    <p class="hint">支持 .xlsx, .xls 格式，请确保第一列为专利摘要</p>
+                    <input type="file" id="excelFileInput" accept=".xlsx,.xls" style="display: none;">
+                </div>
+                <div class="table-container" id="excelTableContainer" style="display: none;">
+                    <table class="excel-data-table" id="excelDataTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">序号</th>
+                                <th>专利摘要</th>
+                                <th class="status-cell">状态</th>
+                                <th class="result-cell">分类结果</th>
+                            </tr>
+                        </thead>
+                        <tbody id="excelDataBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="excel-modal-footer">
+                <div class="excel-progress" id="excelProgress" style="display: none;">
+                    <div class="excel-progress-text" id="excelProgressText">处理中... 0/0</div>
+                    <div class="excel-progress-bar">
+                        <div class="excel-progress-fill" id="excelProgressFill"></div>
+                    </div>
+                </div>
+                <div class="excel-actions">
+                    <button class="btn btn-secondary" id="resetExcelBtn" style="display: none;">
+                        <i class="fas fa-redo"></i> 重新导入
+                    </button>
+                    <button class="btn btn-primary" id="startBatchBtn" style="display: none;">
+                        <i class="fas fa-play"></i> 开始分类
+                    </button>
+                    <button class="btn btn-excel" id="exportResultBtn" style="display: none;">
+                        <i class="fas fa-download"></i> 导出结果
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 初步分类确认弹窗 -->
+    <div class="confirm-modal" id="confirmModal">
+        <div class="confirm-modal-content">
+            <div class="confirm-modal-header">
+                <h3><i class="fas fa-clipboard-check"></i> 初步分类结果</h3>
+            </div>
+            <div class="confirm-modal-body">
+                <div class="confirm-result-display">
+                    <div class="confirm-result-label">请确认以下分类是否正确</div>
+                    <div class="confirm-result-value" id="confirmResultValue">部:- 大类:-</div>
+                </div>
+                <div class="confirm-hint">确认正确后将显示完整分类结果</div>
+            </div>
+            <div class="confirm-modal-footer">
+                <button class="btn btn-primary" id="confirmCorrectBtn">
+                    <i class="fas fa-check"></i> 确认正确
+                </button>
+                <button class="btn btn-secondary" id="confirmWrongBtn">
+                    <i class="fas fa-times"></i> 结果有误
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="1.js"></script>
+</body>
+</html>

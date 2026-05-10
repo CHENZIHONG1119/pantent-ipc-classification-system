@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理后台 - 专利主IPC分类系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <div class="admin-container">
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    <div>
+                        <div class="logo-text">管理后台</div>
+                        <div class="logo-subtitle">系统管理中心</div>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-item active" data-section="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>仪表盘</span>
+                </div>
+                <div class="nav-item" data-section="users">
+                    <i class="fas fa-users"></i>
+                    <span>用户管理</span>
+                </div>
+                <div class="nav-item" data-section="api">
+                    <i class="fas fa-plug"></i>
+                    <span>API配置</span>
+                </div>
+                <div class="nav-item" data-section="data">
+                    <i class="fas fa-database"></i>
+                    <span>数据管理</span>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="back-btn" id="backToMain">
+                    <i class="fas fa-arrow-left"></i>
+                    返回主页
+                </button>
+            </div>
+        </aside>
+
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1 class="page-title" id="pageTitle">仪表盘</h1>
+                <div class="header-controls">
+                    <div class="user-badge">
+                        <i class="fas fa-user-shield"></i>
+                        <span id="adminUsername">管理员</span>
+                    </div>
+                    <button class="theme-toggle" id="themeToggle">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+            </header>
+
+            <div class="admin-content">
+                <!-- 仪表盘 -->
+                <div class="content-section active" id="section-dashboard">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon blue">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-value" id="statUsers">0</div>
+                            <div class="stat-label">注册用户</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon green">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="stat-value" id="statClassifications">0</div>
+                            <div class="stat-label">分类记录</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon orange">
+                                <i class="fas fa-plug"></i>
+                            </div>
+                            <div class="stat-value" id="statApiStatus">--</div>
+                            <div class="stat-label">API状态</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon red">
+                                <i class="fas fa-hdd"></i>
+                            </div>
+                            <div class="stat-value" id="statStorage">0 KB</div>
+                            <div class="stat-label">存储使用</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-clock"></i>
+                                最近分类记录
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-container">
+                                <table class="data-table" id="recentClassifications">
+                                    <thead>
+                                        <tr>
+                                            <th>用户</th>
+                                            <th>标题</th>
+                                            <th>时间</th>
+                                            <th>状态</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 用户管理 -->
+                <div class="content-section" id="section-users">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-users"></i>
+                                用户列表
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-container">
+                                <table class="data-table" id="usersTable">
+                                    <thead>
+                                        <tr>
+                                            <th>用户名</th>
+                                            <th>邮箱</th>
+                                            <th>角色</th>
+                                            <th>注册时间</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- API配置 -->
+                <div class="content-section" id="section-api">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-plug"></i>
+                                Llama Factory API 配置
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="api-status-display">
+                                <div class="status-indicator" id="apiStatusDot"></div>
+                                <span class="status-text" id="apiStatusText">未连接</span>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">API 地址</label>
+                                    <input type="text" class="form-input" id="apiUrl" 
+                                           placeholder="http://localhost:8000" 
+                                           value="http://localhost:8000">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">模型名称</label>
+                                    <input type="text" class="form-input" id="modelName" 
+                                           placeholder="your-model-name">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">API 密钥 (可选)</label>
+                                <input type="password" class="form-input" id="apiKey" 
+                                       placeholder="输入API密钥">
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">最大生成长度</label>
+                                    <input type="number" class="form-input" id="maxTokens" 
+                                           value="512" min="1" max="4096">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">温度参数</label>
+                                    <input type="number" class="form-input" id="temperature" 
+                                           value="0.7" min="0" max="2" step="0.1">
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button class="btn btn-primary" id="testConnection">
+                                    <i class="fas fa-vial"></i>
+                                    测试连接
+                                </button>
+                                <button class="btn btn-success" id="saveApiSettings">
+                                    <i class="fas fa-save"></i>
+                                    保存配置
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 数据管理 -->
+                <div class="content-section" id="section-data">
+                    <div class="card scrollable-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-database"></i>
+                                分类历史数据
+                            </div>
+                            <button class="btn btn-danger btn-sm" id="clearAllData">
+                                <i class="fas fa-trash"></i>
+                                清空所有数据
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-container">
+                                <table class="data-table" id="classificationsTable">
+                                    <thead>
+                                        <tr>
+                                            <th>标题</th>
+                                            <th>摘要预览</th>
+                                            <th>分类结果</th>
+                                            <th>创建时间</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card" style="flex-shrink: 0;">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-broom"></i>
+                                系统清理
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <p style="margin-bottom: 16px; color: var(--text-secondary);">
+                                清理系统数据以释放存储空间。此操作不可恢复，请谨慎操作。
+                            </p>
+                            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                                <button class="btn btn-danger" id="clearClassifications">
+                                    <i class="fas fa-file-alt"></i>
+                                    清空分类记录
+                                </button>
+                                <button class="btn btn-danger" id="clearUsers">
+                                    <i class="fas fa-users"></i>
+                                    清空用户数据
+                                </button>
+                                <button class="btn btn-danger" id="resetSystem">
+                                    <i class="fas fa-redo"></i>
+                                    重置系统
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="message-toast" id="messageToast">
+        <i class="fas fa-check-circle"></i>
+        <span id="messageText"></span>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>

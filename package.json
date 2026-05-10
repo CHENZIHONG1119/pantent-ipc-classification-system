@@ -1,0 +1,16 @@
+{
+  "name": "patent-classification-server",
+  "version": "1.0.0",
+  "description": "专利主IPC分类系统 - 后端服务",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "express": "^4.21.0",
+    "jsonwebtoken": "^9.0.2",
+    "sql.js": "^1.12.0"
+  }
+}
